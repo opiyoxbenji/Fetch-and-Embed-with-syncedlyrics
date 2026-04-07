@@ -19,6 +19,14 @@ while IFS= read -r audio; do
     continue
   fi
 
+  # Skip if LYRICS tag already embedded
+  existing=$(kid3-cli -c "get LYRICS" "$audio" 2>/dev/null)
+  if [ -n "$existing" ]; then
+    echo "⏭ SKIPPED (already embedded): $(basename $audio)"
+    ((SKIPPED++))
+    continue
+  fi
+
   # Skip if no title or artist tag
   if [ -z "$title" ] || [ -z "$artist" ]; then
     echo "✗ NO TAGS: $(basename $audio)"
